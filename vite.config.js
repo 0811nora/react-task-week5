@@ -6,5 +6,18 @@ export default defineConfig(({ command }) => {
   return {
     plugins: [react()],
     base: command === 'build' ? '/react-task-week5/' : '/',
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern-compiler',
+          silenceDeprecations: ['global-builtin', 'import', 'color-functions', 'mixed-decls'],
+          logger: {
+            warn: (message, options) => {
+              if (options.deprecation) return;
+            },
+          },
+        },
+      },
+    },
   }
 })
