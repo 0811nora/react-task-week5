@@ -11,7 +11,7 @@
         aspect-ratio: 3 / 4;
         box-shadow: 5px 8px 10px #2424245c;
         transition:  0.2s;
-        background-color: #000000;
+        background-color: $dark;
         &:hover{
             transform: rotate(5deg);
         }
@@ -24,8 +24,8 @@
         padding: 10px;
         background: linear-gradient(
             to bottom, 
-            rgba(113, 113, 113, 0.571) 0%, 
-            rgba(24, 24, 24, 0.605) 100%
+            rgba(31, 31, 31, 0.63) 0%, 
+            rgba(224, 224, 224, 0.548) 100%
         );
 
     }

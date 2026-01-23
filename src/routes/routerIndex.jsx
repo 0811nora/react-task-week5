@@ -2,6 +2,7 @@ import App from '../App.jsx';
 import { createHashRouter } from "react-router-dom";
 import Home from '../Pages/Home.jsx';
 import Product from '../Pages/Product.jsx';
+import ProductDetail from '../Pages/ProductDetail.jsx';
 
 const routes = [
     {
@@ -12,13 +13,10 @@ const routes = [
             {
                 path: 'product',
                 element:<Product />,
-                children:[
-                    {
-                        path:'id',
-                        element: <></>
-                    }
-                    
-                ]
+            },
+            {
+                path:'/product/:id',
+                element: <ProductDetail/>
             }
         ]
     },
