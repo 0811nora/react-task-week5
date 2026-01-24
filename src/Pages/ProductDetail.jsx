@@ -1,8 +1,13 @@
 import {  useNavigate,  useParams } from "react-router-dom";
-import PageTransition from "../components/PageTransition";
+import { errorNotify, successNotify } from "../components/Toast";
 import { useState, useEffect} from "react";
-import { getAllProducts } from "../api/Api";
+import { getAllProducts , postAddToCart } from "../api/Api";
+import PageTransition from "../components/PageTransition";
 import ProductCard from "../components/ProdeuctCard";
+import Loader from "../components/Loader";
+
+
+
 
 
 
@@ -14,10 +19,13 @@ function ProductDetail() {
     const [ allProduct , setAllProduct ] = useState([]);
     const [ num , setNum ] = useState(1);
     const [ recommendData , setRecommendData ] = useState([]);
+    const [ isLoading , setIsLoading ] = useState(false);
+
 
     useEffect(()=>{
         console.log(allProduct)
     },[allProduct])
+
 
     const  randomProducts = (products) => {
         return [...products]
@@ -25,12 +33,16 @@ function ProductDetail() {
             .slice(0, 8);
     }
 
+
     useEffect(() => {
         const getProductData = async () => {
+            setIsLoading(true);
+            
             try{
                 const res = await getAllProducts();
                 setAllProduct(res.data.products);
                 setRecommendData(randomProducts(res.data.products));
+                setIsLoading(false);
                 
             }catch(err){
                 console.log(err)
@@ -39,7 +51,33 @@ function ProductDetail() {
         getProductData();
     },[])
 
+    useEffect(() => {
+        setNum(1);
+    },[id])
+
     const targetData = allProduct.find((item) =>item.id === id);
+
+    if(isLoading){
+        return <div className="loader-overlay">
+            <Loader/>
+        </div>
+    }
+
+    const postAddCart = async(id , num) => {
+        const data = {
+            "product_id": id,
+            "qty": num
+        }
+        try{
+            const res = await postAddToCart(data);
+            successNotify(res.data.message)
+
+        }catch(err){
+            errorNotify(err.response.data.message[0])
+        }
+    }
+
+
 
 
     return(<>
@@ -72,7 +110,8 @@ function ProductDetail() {
                                             <button onClick={() => setNum(num +1)}><i class="bi bi-plus-lg"></i></button>
                                         </div>
                                         <div className="">
-                                            <button className="btn btn-primary px-4  rounded-0 addCartBtn">
+                                            <button className="btn btn-primary px-4  rounded-0 addCartBtn"
+                                                onClick={()=>postAddCart(targetData.id,num)}>
                                                 <i class="bi bi-plus-lg me-2"></i>購物車
                                             </button>
                                         </div>

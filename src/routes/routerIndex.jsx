@@ -3,6 +3,7 @@ import { createHashRouter } from "react-router-dom";
 import Home from '../Pages/Home.jsx';
 import Product from '../Pages/Product.jsx';
 import ProductDetail from '../Pages/ProductDetail.jsx';
+import CartPage from '../Pages/Cart.jsx';
 
 const routes = [
     {
@@ -10,14 +11,9 @@ const routes = [
         element: <App/>, 
         children:[  
             {index: true,  element: <Home/> },
-            {
-                path: 'product',
-                element:<Product />,
-            },
-            {
-                path:'/product/:id',
-                element: <ProductDetail/>
-            }
+            {path: 'cart',element:<CartPage />,},
+            {path: 'product',element:<Product />,},
+            {path:'/product/:id',element: <ProductDetail/>}
         ]
     },
     

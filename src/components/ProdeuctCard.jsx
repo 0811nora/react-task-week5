@@ -1,6 +1,8 @@
 import { Link} from "react-router-dom";
 import { postAddToCart } from "../api/Api";
 import { errorNotify, successNotify } from "./Toast";
+import PageTransition from "../components/PageTransition";
+
 
 
 
@@ -29,8 +31,8 @@ function ProductCard({data}) {
 
 
     return(
-        
-            <div className="productCard ">
+        <PageTransition>
+            <div className="productCard mx-auto" style={{maxWidth:"960px"}}>
                 <div className="row row-cols-2">
                     {data.map((item) => (
                         <div className="col-6 col-md-4 col-lg-3" key={item.id}>
@@ -69,6 +71,7 @@ function ProductCard({data}) {
             
                 
             </div>
+        </PageTransition>
     )
 }
 
