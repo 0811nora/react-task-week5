@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getCart ,deleteCartItem, putCartItem } from "../api/Api";
 import { errorNotify, successNotify } from "../components/Toast";
 import Loader from "../components/Loader";
@@ -9,7 +9,6 @@ function CartPage(){
 
     const [ cartAllList , setCartAllList ] = useState([]);
     const [ isLoading , setIsLoading ] = useState(false);
-
 
 
     const getcart = async () => {
@@ -24,16 +23,19 @@ function CartPage(){
         }
     }
 
+    const totalPrice = useMemo(() => {
+        return cartAllList.reduce((a,b) => a + b.final_total,0)
+    },[cartAllList])
 
-    const totalPrice = cartAllList.reduce((a,b) => a + b.final_total,0)
-    const totalAmount = cartAllList.reduce((a,b) =>  a + b.qty ,0)
+    const totalAmount = useMemo(()=>{
+        return cartAllList.reduce((a,b) =>  a + b.qty ,0)
+    },[cartAllList])
 
     
 
     useEffect(() => {
         getcart();
     },[])
-
 
 
     const delCartItem = async(id) => {
@@ -49,9 +51,10 @@ function CartPage(){
     }
 
 
-    const editQty = async(id,num,type) => {
+    const editQty = async(id,num,price,total,type) => {
 
-        const newQty = type ? num +1 : num -1
+        const newQty = type ? num + 1 : num -1
+        const newtotal = type ? total + price : total - price
 
         if( newQty <= 0 ){
             delCartItem(id)
@@ -60,7 +63,7 @@ function CartPage(){
 
         setCartAllList((pre) => (
             pre.map((item) => item.id === id
-                ? {...item, qty: newQty}
+                ? {...item, qty: newQty , total:newtotal , final_total:newtotal}
                 : item
             )
         ))
@@ -111,38 +114,45 @@ function CartPage(){
                                                     
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                {cartAllList.map((item) => (
-                                                    <tr key={item.id}>
-                                                        <td className="pe-0">
-                                                            <button className="btn btn-text" onClick={()=> delCartItem(item.id)}>
-                                                                <i class="bi bi-x-circle text-primary"></i>
-                                                            </button>
-                                                        </td>
-                                                        <td scope="row ">
-                                                            <span>
-                                                                <img style={{width:"50px",height:"50px"}} src={item.product.imageUrl} alt="" />
-                                                            </span>
-                                                            <span className="ms-3">{item.product.title}</span>
-                                                        </td>
-                                                        <td className="text-center countBtn">
-                                                            <button className="btn" onClick={()=>editQty(item.id,item.qty,0)}>
-                                                                <i class="bi bi-dash text-white"></i>
-                                                            </button>
-                                                            <span className="px-3">{item.qty}</span>
-                                                            <button className="btn" onClick={()=>editQty(item.id,item.qty,1)}>
-                                                                <i class="bi bi-plus-lg text-white"></i>
-                                                            </button>
+                                            {cartAllList.length === 0
+                                                ? <tbody>
+                                                    <td colspan="5" className="text-center fs-4" style={{padding:"90px 0"}}>購物車沒有商品，趕快去購買吧!</td>
+                                                    
+                                                    </tbody>
+                                                : <tbody>
+                                                    {cartAllList.map((item) => (
+                                                        <tr key={item.id}>
+                                                            <td className="pe-0">
+                                                                <button className="btn btn-text" onClick={()=> delCartItem(item.id)}>
+                                                                    <i class="bi bi-x-circle text-primary"></i>
+                                                                </button>
+                                                            </td>
+                                                            <td scope="row ">
+                                                                <span>
+                                                                    <img style={{width:"50px",height:"50px"}} src={item.product.imageUrl} alt="" />
+                                                                </span>
+                                                                <span className="ms-3">{item.product.title}</span>
+                                                            </td>
+                                                            <td className="text-center countBtn">
+                                                                <button className="btn" onClick={()=>editQty(item.id,item.qty,item.product.price,item.total,0)}>
+                                                                    <i class="bi bi-dash text-white"></i>
+                                                                </button>
+                                                                <span className="px-3">{item.qty}</span>
+                                                                <button className="btn" onClick={()=>editQty(item.id,item.qty,item.product.price,item.total,1)}>
+                                                                    <i class="bi bi-plus-lg text-white"></i>
+                                                                </button>
 
+                                                                
+                                                            </td>
+                                                            <td className="text-center">$ {item.product.price}</td>
+                                                            <td className="text-center">$ {item.total}</td>
                                                             
-                                                        </td>
-                                                        <td className="text-center">$ {item.product.price}</td>
-                                                        <td className="text-center">$ {item.total}</td>
-                                                        
-                                                    </tr>
-                                                ))}
+                                                        </tr>
+                                                    ))}
                                                 
                                             </tbody>
+                                            }
+                                            
                                         </table>
                                     </div>
                                     <div className="col-4">
